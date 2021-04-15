@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CleverHeating.Models;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace CleverHeating.Controllers
 {
@@ -14,10 +16,12 @@ namespace CleverHeating.Controllers
     public class OfficesController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public OfficesController(ApplicationContext context)
+        public OfficesController(ApplicationContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         // GET: api/Offices
@@ -41,8 +45,20 @@ namespace CleverHeating.Controllers
             return office;
         }
 
+        [HttpGet("GetOfficeRooms/{id}")]
+        public async Task<ActionResult<Office>> GetOfficeRooms(int id)
+        {
+            var office = await _context.Office.FindAsync(id);
+
+            if (office == null)
+            {
+                return NotFound();
+            }
+            List<Room> rooms = await _context.Room.Where(r => r.OfficeId == id).ToListAsync();
+            return new ObjectResult(rooms);
+        }
+
         // PUT: api/Offices/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOffice(int id, Office office)
         {
@@ -73,7 +89,6 @@ namespace CleverHeating.Controllers
         }
 
         // POST: api/Offices
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Office>> PostOffice(Office office)
         {
@@ -102,6 +117,35 @@ namespace CleverHeating.Controllers
         private bool OfficeExists(int id)
         {
             return _context.Office.Any(e => e.Id == id);
+        }
+
+        [HttpPost("/Offices/SaveFile/{id}")]
+        public async Task<IActionResult> SaveFile(int id)
+        {
+            try
+            {
+                Office office = await _context.Office.FirstOrDefaultAsync(cp => cp.Id == id);
+                var httpRequest = Request.Form;
+                var postedFile = httpRequest.Files[0];
+                string filename = postedFile.FileName;
+                string newFileName = $"{office.Id}_{office.Name}.png";
+                var physicalPath = _env.ContentRootPath + "/Photos/Company/" + newFileName;
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    await postedFile.CopyToAsync(stream);
+                }
+                office.PhotoFileName = newFileName;
+                _context.Entry(office).State = EntityState.Modified;
+                _context.Office.Update(office);
+                await _context.SaveChangesAsync();
+
+                return new JsonResult(newFileName);
+            }
+            catch
+            {
+                return new JsonResult("default_company_image.png");
+            }
         }
     }
 }

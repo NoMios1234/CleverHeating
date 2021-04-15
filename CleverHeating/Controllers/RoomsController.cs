@@ -41,8 +41,20 @@ namespace CleverHeating.Controllers
             return room;
         }
 
+        [HttpGet("GetRoomEquipments/{id}")]
+        public async Task<ActionResult<Room>> GetRoomEquipments(int id)
+        {
+            var room = await _context.Room.FindAsync(id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+            List<Equipment> equipments = await _context.Equipment.Where(eq => eq.RoomId == id).ToListAsync();
+            return new ObjectResult(equipments);
+        }
+
         // PUT: api/Rooms/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRoom(int id, Room room)
         {
@@ -73,7 +85,6 @@ namespace CleverHeating.Controllers
         }
 
         // POST: api/Rooms
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Room>> PostRoom(Room room)
         {
