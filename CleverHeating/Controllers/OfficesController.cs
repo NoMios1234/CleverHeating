@@ -119,32 +119,27 @@ namespace CleverHeating.Controllers
             return _context.Office.Any(e => e.Id == id);
         }
 
-        [HttpPost("/Offices/SaveFile/{id}")]
-        public async Task<IActionResult> SaveFile(int id)
+        [Route("SaveFile")]
+        [HttpPost]
+        public JsonResult SaveFile()
         {
             try
             {
-                Office office = await _context.Office.FirstOrDefaultAsync(cp => cp.Id == id);
                 var httpRequest = Request.Form;
                 var postedFile = httpRequest.Files[0];
                 string filename = postedFile.FileName;
-                string newFileName = $"{office.Id}_{office.Name}.png";
-                var physicalPath = _env.ContentRootPath + "/Photos/Company/" + newFileName;
+                var physicalPath = _env.ContentRootPath + "/Photos/Office/" + filename;
 
                 using (var stream = new FileStream(physicalPath, FileMode.Create))
                 {
-                    await postedFile.CopyToAsync(stream);
+                    postedFile.CopyTo(stream);
                 }
-                office.PhotoFileName = newFileName;
-                _context.Entry(office).State = EntityState.Modified;
-                _context.Office.Update(office);
-                await _context.SaveChangesAsync();
 
-                return new JsonResult(newFileName);
+                return new JsonResult(filename);
             }
-            catch
+            catch (Exception)
             {
-                return new JsonResult("default_company_image.png");
+                return new JsonResult("default_office_image.png");
             }
         }
     }

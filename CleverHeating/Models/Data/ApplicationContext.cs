@@ -13,7 +13,7 @@ namespace CleverHeating.Models
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
            : base(options)
         {
-            Database.EnsureCreated();
+
         }
         public DbSet<Office> Office { get; set; }
         public DbSet<Room> Room { get; set; }

@@ -42,7 +42,6 @@ namespace CleverHeating.Controllers
         }
 
         // PUT: api/Equipments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEquipment(int id, Equipment equipment)
         {
@@ -73,7 +72,6 @@ namespace CleverHeating.Controllers
         }
 
         // POST: api/Equipments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Equipment>> PostEquipment(Equipment equipment)
         {

@@ -42,7 +42,6 @@ namespace CleverHeating.Controllers
         }
 
         // PUT: api/Statistics/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStatistic(int id, Statistic statistic)
         {
@@ -73,7 +72,6 @@ namespace CleverHeating.Controllers
         }
 
         // POST: api/Statistics
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Statistic>> PostStatistic(Statistic statistic)
         {
