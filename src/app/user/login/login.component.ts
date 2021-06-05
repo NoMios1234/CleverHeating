@@ -19,6 +19,10 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(){
+    this.service.getUserList().subscribe(res =>
+      {
+        console.log(res);
+      })
     this.service.login().subscribe(
       (res: any) => {
         localStorage.setItem('token', res.token);

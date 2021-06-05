@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient  } from "@angular/common/http";
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -48,15 +49,22 @@ export class UserService {
       Password: this.formModel.value.Passwords.Password,
       PasswordConfirm: this.formModel.value.Passwords.PasswordConfirm
     };
+    console.log(body);
     return this.http.post(this.BaseURI + '/users/register', body);
   }
 
   login() {
     var body = {
+      
       Email: this.loginForm.value.Email,
       Password: this.loginForm.value.Password
     };
+    console.log(body);
     return this.http.post(this.BaseURI + '/users/login', body);
+  }
+  
+  getUserList():Observable<any[]>{
+    return this.http.get<any>(this.BaseURI+'/Users');
   }
 
   getUserProfile() {
